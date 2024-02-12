@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,36 +21,41 @@ import com.example.demo.service.CountryService;
 @RequestMapping("/countries")
 public class CountryController {
 
-	@Autowired
-	private CountryService countryService;
-	
-	@PostMapping("/create")
-	public ResponseEntity<CountryDto> createCountry(@RequestBody CountryDto countryDto){
-		CountryDto createCountry = countryService.createCountry(countryDto);
-		return new ResponseEntity<>(createCountry, HttpStatus.CREATED);
-	}
-	 @GetMapping("/get/{id}")
-	    public ResponseEntity<CountryDto> getCountryById(@PathVariable Long id) {
-	        CountryDto countryDto = countryService.getCountry(id);
-	        if (countryDto == null) {
-	            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-	        }
-	        return new ResponseEntity<>(countryDto, HttpStatus.OK);
-	    }
-	 @PutMapping("/update/{id}")
-	    public ResponseEntity<CountryDto> updateCountry(@PathVariable Long id, @RequestBody CountryDto countryDto) {
-	        CountryDto updatedCountry = countryService.updateCountry(id, countryDto);
-	        if (updatedCountry == null) {
-	            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-	        }
-	        return new ResponseEntity<>(updatedCountry, HttpStatus.OK);
-	    }
+    @Autowired
+    private CountryService countryService;
 
-	    @DeleteMapping("/delete/{id}")
-	    public ResponseEntity<Void> deleteCountry(@PathVariable Long id) {
-	        if (countryService.deleteCountry(id)) {
-	            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	        }
-	        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-	    }
+    @PostMapping("/create")
+    public ResponseEntity<CountryDto> createCountry(@RequestBody CountryDto countryDto) {
+        CountryDto createdCountry = countryService.createCountry(countryDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCountry);
+    }
+
+    @GetMapping("/get/{id}")
+    public ResponseEntity<CountryDto> getCountryById(@PathVariable Long id) {
+        CountryDto countryDto = countryService.getCountry(id);
+        return countryDto != null ? ResponseEntity.ok(countryDto) : ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<CountryDto> updateCountry(@PathVariable Long id, @RequestBody CountryDto countryDto) {
+        CountryDto updatedCountry = countryService.updateCountry(id, countryDto);
+        return updatedCountry != null ? ResponseEntity.ok(updatedCountry) : ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteCountry(@PathVariable Long id) {
+        return countryService.deleteCountry(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{countryId}/appendState/{stateId}")
+    public ResponseEntity<Void> appendStateToCountry(@PathVariable Long countryId, @PathVariable Long stateId) {
+        return countryService.appendStateToCountry(countryId, stateId) ?
+                ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<CountryDto>> getAllCountries() {
+        List<CountryDto> countries = countryService.getAllCountries();
+        return ResponseEntity.ok(countries);
+    }
 }

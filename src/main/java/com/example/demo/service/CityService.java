@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import java.util.List;
+
 import com.example.demo.dto.CityDto;
 
 public interface CityService  {
@@ -8,4 +10,5 @@ public interface CityService  {
 	CityDto getCityByID(Long id);
 	CityDto updateCity(Long id, CityDto cityDto);
     boolean deleteCity(Long id);
+    List<CityDto> getAllCities();
 }
